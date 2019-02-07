@@ -1,0 +1,16 @@
+{
+  "name": "is",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Varun Gupta <varun.gupta1798@gmail.com> (http://codingblocks.com)",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4",
+    "image-sequencer": "^2.4.0"
+  }
+}
