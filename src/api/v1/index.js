@@ -1,13 +1,8 @@
-const express = require('express'),
-    sequencer = require('image-sequencer')({ ui: false }),
-    bp = require('body-parser');
+const router = require('express').Router(),
+    sequencer = require('image-sequencer')({ ui: false });
 
-const app = express();
 
-app.use(bp.json());
-app.use(bp.urlencoded({ extended: true }));
-
-app.post("/", (req, res) => {
+router.post("/process", (req, res) => {
 
     /*  Import the image into sequencer, possibly from the url
         Next step is to import the sequence given as the string
@@ -16,13 +11,21 @@ app.post("/", (req, res) => {
     */
 
     const img = req.body.url,
-        sequence = req.body.sequence;
+        sequence = req.body.sequence,
+        upload = req.body.upload === 'true';
+    console.log(upload)
     sequencer.loadImages(img, () => {
         sequencer.importString(sequence);
         sequencer.run(out => {
+            res.status(200);
             res.send({ data: out });
         });
     });
 });
 
-app.listen(4000, () => console.log("Server started on port 4000"));
+
+router.use("/", (req, res) => {
+    res.sendStatus(404);
+});
+
+module.exports = router;
