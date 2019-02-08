@@ -15,7 +15,8 @@ chai.use(chaiHttp);
  */
 describe('/POST /ap1/v1/process', () => {
     it('should send status 200', (done) => {
-        chai.request(server)
+        server.listen(8080, () => { });
+        chai.request("http://localhost:8080")
             .post('/api/v1/process')
             .send({ url: '../Images/Mario.png', upload: false, sequence: 'invert{}' })
             .end((err, res) => {
