@@ -19,8 +19,8 @@ describe('/POST /ap1/v1/process', () => {
             .post('/api/v1/process')
             .send({ url: '../Images/Mario.png', upload: false, sequence: 'invert{}' })
             .end((err, res) => {
+                console.log(res.body.data.length);
                 res.should.have.status(200);
-                console.log(res.body.data.length)
                 done();
             });
     });
