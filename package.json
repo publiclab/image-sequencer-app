@@ -5,7 +5,7 @@
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "test": "echo \"Error: no test specified\" && exit 0"
+    "test": "mocha"
   },
   "author": "Varun Gupta <varun.gupta1798@gmail.com>",
   "license": "ISC",
@@ -16,6 +16,7 @@
   },
   "devDependencies": {
     "chai": "^4.2.0",
-    "chai-http": "^4.2.1"
+    "chai-http": "^4.2.1",
+    "mocha": "^5.2.0"
   }
 }
