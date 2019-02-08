@@ -15,12 +15,10 @@ chai.use(chaiHttp);
  */
 describe('/POST /ap1/v1/process', () => {
     it('should send status 200', (done) => {
-        server.listen(8080, () => { });
-        chai.request("http://localhost:8080")
+        chai.request(server)
             .post('/api/v1/process')
             .send({ url: '../Images/Mario.png', upload: false, sequence: 'invert{}' })
             .end((err, res) => {
-                console.log(res.body.data.length);
                 res.should.have.status(200);
                 done();
             });
