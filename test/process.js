@@ -20,6 +20,7 @@ describe('/POST /ap1/v1/process', () => {
             .send({ url: '../Images/Mario.png', upload: false, sequence: 'invert{}' })
             .end((err, res) => {
                 res.should.have.status(200);
+                console.log(res.body.data.length)
                 done();
             });
     });
