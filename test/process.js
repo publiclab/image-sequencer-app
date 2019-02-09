@@ -13,13 +13,13 @@ chai.use(chaiHttp);
 /*
  * Test the /api/v1/process route
  */
-describe('/POST /ap1/v1/process', () => {
-    it('should send status 200', (done) => {
+describe('/POST /ap1/v1/', () => {
+    it('should send status 404', (done) => {
         chai.request(server)
-            .post('/api/v1/process')
+            .post('/api/v1/')
             .send({ url: '../Images/Mario.png', upload: false, sequence: 'invert{}' })
             .end((err, res) => {
-                res.should.have.status(200);
+                res.should.have.status(404);
                 done();
             });
     });
