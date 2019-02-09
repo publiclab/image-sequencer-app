@@ -1,6 +1,12 @@
 language: node_js
 node_js:
  - "stable"
+service:
+  - docker
+before_install:
+  - docker-compose build
+  - docker run -p 4000:4000 image-sequencer-app
+
 script: npm test
 install:
  - npm install
