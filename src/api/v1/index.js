@@ -13,7 +13,6 @@ router.post("/process", (req, res) => {
     const img = req.body.url,
         sequence = req.body.sequence,
         upload = req.body.upload === 'true';
-    console.log(upload)
     sequencer.loadImages(img, () => {
         sequencer.importString(sequence);
         sequencer.run(out => {
