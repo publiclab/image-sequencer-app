@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/publiclab/image-sequencer-app.svg?branch=main)](https://travis-ci.org/publiclab/image-sequencer-app)
+
 # This is the Image Sequencer API based on express.js
 
 ## Request Structure:
