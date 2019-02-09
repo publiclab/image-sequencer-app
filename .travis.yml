@@ -6,7 +6,6 @@ services:
 before_install:
   - docker build -t image-sequencer-app .
   - docker-compose build
-  - docker run -p 4000:4000 image-sequencer-app
 
 script: npm test
 install:
