@@ -5,7 +5,7 @@
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "test": "mocha"
+    "test": "mocha --timeout 100000"
   },
   "author": "Varun Gupta <varun.gupta1798@gmail.com>",
   "license": "ISC",
