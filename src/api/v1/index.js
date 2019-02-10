@@ -12,12 +12,13 @@ router.post("/process", (req, res) => {
 
     const img = req.body.url,
         sequence = req.body.sequence,
-        upload = req.body.upload === 'true';
+        upload = req.body.upload === 'true',
+        redirect = req.body.redirect === 'true';
     sequencer.loadImages(img, () => {
         sequencer.importString(sequence);
         sequencer.run(out => {
             res.status(200);
-            res.send({ data: out });
+            redirect ? res.redirect(out) : res.send({ data: out });
         });
     });
 });
