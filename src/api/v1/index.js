@@ -2,28 +2,25 @@ const router = require('express').Router(),
     sequencer = require('image-sequencer');
 
 
-router.post("/process", (req, res) => {
+// router.post("/process", (req, res) => {
 
-    /*  Import the image into sequencer, possibly from the url
-        Next step is to import the sequence given as the string
-        then we generate the ouput and return as data URI or
-        upload it imgur and return the url of the image.
-    */
-    const img = req.body.url,
-        sequence = req.body.sequence,
-        upload = req.body.upload === 'true';
-    process(img, sequence, (out) => {
-        res.status(200).send({ data: out });
-    });
+//     /*  Import the image into sequencer, possibly from the url
+//         Next step is to import the sequence given as the string
+//         then we generate the ouput and return as data URI or
+//         upload it imgur and return the url of the image.
+//     */
+//     const imgs = req.body.images,
+//         upload = req.body.upload === 'true';
+//     process(img, sequence, (out) => {
+//         res.status(200).send({ data: out });
+//     });
 
-});
+// });
 
 router.get("/process", (req, res) => {
 
-    req.query.urls = JSON.parse(req.query.urls)
-    console.log(req.query)
-    const imgs = req.query.urls,
-        sequence = req.query.sequence,
+    req.query.images = JSON.parse(req.query.images)
+    const imgs = req.query.images,
         upload = req.query.upload === 'true';
 
     let i = 0
@@ -32,7 +29,7 @@ router.get("/process", (req, res) => {
         if (i < imgs.length - 1) {
             console.log(i);
             i++;
-            process(imgs[i], sequence, cb);
+            process(imgs[i].url, imgs[i].sequence, cb);
         } else {
 
             /* Here we want combine the images */
@@ -45,7 +42,7 @@ router.get("/process", (req, res) => {
             res.send(html);
         }
     }
-    process(imgs[0], sequence, cb)
+    process(imgs[0].url, imgs[0].sequence, cb);
 
 })
 
