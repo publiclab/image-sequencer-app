@@ -6,8 +6,15 @@
 ```js
 // POST : /api/v1/process
 {
-    url: <URL> // Url for the image to be processed
-    sequence: <String> // Stringified Image sequencer string
+    images: [
+        {
+            url: <URL> // Url for the image to be processed
+            sequence: <String> // Stringified Image sequencer string
+        },
+        {
+
+        }
+    ],
     upload: <Boolean> // Tells the server to upload the final image
     redirect: <Boolean> //Tells the server whether to return as json or to redirect
 }
