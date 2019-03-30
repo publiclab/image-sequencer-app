@@ -6,10 +6,13 @@
 ```js
 // POST : /api/v1/process
 {
-    images: [
+    steps: [
         {
-            url: <URL> // Url for the image to be processed
-            sequence: <String> // Stringified Image sequencer string
+            input: <URL> // Url for the image to be processed
+            OR
+            input: <id of the a previous step>
+            steps: <String> // Stringified Image sequencer string
+            depends: <Array of ids this depends on>
         },
         {
 
