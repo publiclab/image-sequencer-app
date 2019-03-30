@@ -19,30 +19,60 @@ const router = require('express').Router(),
 
 router.get("/process", (req, res) => {
 
-    req.query.images = JSON.parse(req.query.images)
-    const imgs = req.query.images,
-        upload = req.query.upload === 'true';
+    let body;
+    if (Object.keys(req.body).length === 0) {
+        body = req.query;
+        body.steps = JSON.parse(body.steps)
+    }
+    else
+        body = req.body;
 
-    let i = 0
+
+    let imgs = body.steps,
+        upload = body.upload === 'true';
+
+    imgs.sort((a, b) => a.id - b.id); // sort the input on id
+
+    //build the graph
+    var g = [];
+    for (let img of imgs) {
+        if (img.hasOwnProperty("depends")) {
+            for (let Did of img.depends) {
+                g.push([Did, img.id]);
+            }
+        }
+    }
+
+
+    imgs = require('toposort')(g).map((id) => imgs[id - 1]); //topologically sort imgs
+    // console.log(imgs)
+
+    let i = 0, rv = {};
+
     let cb = (out) => {
-        imgs[i] = out;
+        rv[imgs[i].id] = out;
         if (i < imgs.length - 1) {
-            console.log(i);
+            console.log(imgs[i].id);
             i++;
-            process(imgs[i].url, imgs[i].sequence, cb);
+            if (typeof imgs[i].input === 'number') imgs[i].input = rv[imgs[i].input];
+            process(imgs[i].input, imgs[i].steps, cb);
         } else {
+
+
 
             /* Here we want combine the images */
 
             var html = `<html>`
-            for (let img of imgs) {
+            for (let img of Object.values(rv)) {
                 html += `<img src= "${img}">`
             }
             html += `</html>`
             res.send(html);
         }
     }
-    process(imgs[0].url, imgs[0].sequence, cb);
+    if (typeof imgs[0].input === 'number') imgs[0].input = rv[img[0].input];
+
+    process(imgs[0].input, imgs[0].steps, cb);
 
 })
 

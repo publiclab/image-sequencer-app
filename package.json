@@ -12,7 +12,8 @@
   "dependencies": {
     "body-parser": "^1.18.3",
     "express": "^4.16.4",
-    "image-sequencer": "^3.0.1"
+    "image-sequencer": "^3.0.1",
+    "toposort": "^2.0.2"
   },
   "devDependencies": {
     "chai": "^4.2.0",
