@@ -30,21 +30,28 @@ router.get("/process", (req, res) => {
 
     let imgs = body.steps,
         upload = body.upload === 'true';
-
     imgs.sort((a, b) => a.id - b.id); // sort the input on id
 
+    let includedSteps = {}, // stores the steps which are included in the graph
+        independentSteps = [];
     //build the graph
     var g = [];
     for (let img of imgs) {
         if (img.hasOwnProperty("depends")) {
+            includedSteps[img.id] = true;
             for (let Did of img.depends) {
+                includedSteps[Did] = true;
                 g.push([Did, img.id]);
             }
         }
     }
-
+    for (let img of imgs) {
+        if (!includedSteps[img.id])
+            independentSteps.push(img);
+    }
 
     imgs = require('toposort')(g).map((id) => imgs[id - 1]); //topologically sort imgs
+    imgs.push(...independentSteps);
     // console.log(imgs)
 
     let i = 0, rv = {};
