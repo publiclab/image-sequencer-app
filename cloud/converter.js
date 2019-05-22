@@ -26,7 +26,7 @@ function convert(arr) {
         }
         console.log(coords)
         if (flag) {
-            vals.steps = `webgl-distort{${encodeURIComponent(`nw:${coords[2].x}%2C${coords[2].y}|ne:${coords[3].x}%2C${coords[3].y}|se:${coords[0].x}%2C${coords[0].y}|sw:${coords[1].x}%2C${coords[1].y}`)}}`
+            vals.steps = `canvas-resize,webgl-distort{${encodeURIComponent(`nw:${coords[2].x}%2C${coords[2].y}|ne:${coords[3].x}%2C${coords[3].y}|se:${coords[0].x}%2C${coords[0].y}|sw:${coords[1].x}%2C${coords[1].y}`)}}`
             rv.push(vals);
         }
     }
@@ -35,6 +35,5 @@ function convert(arr) {
 }
 
 require("axios").get("https://mapknitter.org/maps/pvdtest/warpables.json").then(function(data) {
-    console.log(data.data[0].nodes)
-    console.log(convert(data.data))
+    console.log(`https://us-central1-public-lab.cloudfunctions.net/is-function-edge/?steps=${JSON.stringify(convert(data.data))}`);
 })
