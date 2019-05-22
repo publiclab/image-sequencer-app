@@ -141,4 +141,6 @@ let a = [
     }
 ];
 
-console.log(convert(a))
+require("axios").get("https://mapknitter.org/maps/pvdtest/warpables.json").then(function(data) {
+    console.log(convert(data.data))
+})
