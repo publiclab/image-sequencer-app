@@ -22,10 +22,10 @@ function convert(arr) {
         id++;
         for (let node of obj["nodes"]) {
             flag = true;
-            coords.push({ x: (node.lat - minX) * obj.width / (maxX - minX), y: (node.lon - minY) * obj.height / (maxY - minY) });
+            coords.push({ x: Math.round((node.lat - minX) * obj.width / (maxX - minX)), y: Math.round((node.lon - minY) * obj.height / (maxY - minY)) });
         }
         if (flag) {
-            vals.steps = `webgl-distort{nw:${coords[3].x},${coords[3].y}|ne:${coords[0].x},${coords[0].y}|sw:${coords[1].x},${coords[1].y}|sw:${coords[2].x},${coords[2].y}}`
+            vals.steps = `webgl-distort{${encodeURIComponent(`nw:${coords[3].x}%2C${coords[3].y}|ne:${coords[0].x}%2C${coords[0].y}|se:${coords[1].x}%2C${coords[1].y}|sw:${coords[2].x}%2C${coords[2].y}`)}}`
             rv.push(vals);
         }
     }
