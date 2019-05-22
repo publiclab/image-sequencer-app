@@ -4,17 +4,17 @@ function convert(arr) {
     for (let obj of arr) {
         let minX, maxX, minY, maxY;
         for (let node of obj["nodes"]) {
-            if (!minX || minX > node.lat) {
-                minX = node.lat;
+            if (!minX || minX > node.lon) {
+                minX = node.lon;
             }
-            if (!minY || minY > node.lon) {
-                minY = node.lon;
+            if (!minY || minY > node.lat) {
+                minY = node.lat;
             }
-            if (!maxX || maxX < node.lat) {
-                maxX = node.lat;
+            if (!maxX || maxX < node.lon) {
+                maxX = node.lon;
             }
-            if (!maxY || maxY < node.lon) {
-                maxY = node.lon;
+            if (!maxY || maxY < node.lat) {
+                maxY = node.lat;
             }
         }
         let vals = { id: id, input: obj.src }
@@ -22,10 +22,11 @@ function convert(arr) {
         id++;
         for (let node of obj["nodes"]) {
             flag = true;
-            coords.push({ x: Math.round((node.lat - minX) * obj.width / (maxX - minX)), y: Math.round((node.lon - minY) * obj.height / (maxY - minY)) });
+            coords.push({ x: Math.round((node.lon - minX) * obj.width / (maxX - minX)), y: Math.round((node.lat - minY) * obj.height / (maxY - minY)) });
         }
+        console.log(coords)
         if (flag) {
-            vals.steps = `webgl-distort{${encodeURIComponent(`nw:${coords[3].x}%2C${coords[3].y}|ne:${coords[0].x}%2C${coords[0].y}|se:${coords[1].x}%2C${coords[1].y}|sw:${coords[2].x}%2C${coords[2].y}`)}}`
+            vals.steps = `webgl-distort{${encodeURIComponent(`nw:${coords[2].x}%2C${coords[2].y}|ne:${coords[3].x}%2C${coords[3].y}|se:${coords[0].x}%2C${coords[0].y}|sw:${coords[1].x}%2C${coords[1].y}`)}}`
             rv.push(vals);
         }
     }
@@ -33,114 +34,7 @@ function convert(arr) {
     return rv;
 }
 
-let a = [
-    {
-        cm_per_pixel: 24.771,
-        created_at: "2019-04-30T20:40:21Z",
-        deleted: false,
-        height: 166,
-        history: "",
-        id: 312455,
-        image_content_type: "image/png",
-        image_file_name: "test.png",
-        image_file_size: 103148,
-        locked: false,
-        map_id: 13238,
-        nodes: [
-            {
-                author: "warren",
-                body: null,
-                color: "black",
-                created_at: "2019-04-30T20:40:36Z",
-                description: "",
-                id: 2629578,
-                lat: 41.8200720823,
-                lon: -71.4033919887,
-                map_id: 0,
-                name: "",
-                order: 0,
-                updated_at: "2019-04-30T20:40:36Z",
-                way_id: 0,
-                way_order: 0
-            },
-            {
-                author: "warren",
-                body: null,
-                color: "black",
-                created_at: "2019-04-30T20:40:36Z",
-                description: "",
-                id: 2629579,
-                lat: 41.8199361572,
-                lon: -71.4029521064,
-                map_id: 0,
-                name: "",
-                order: 0,
-                updated_at: "2019-04-30T20:40:36Z",
-                way_id: 0,
-                way_order: 0
-            },
-            {
-                author: "warren",
-                body: null,
-                color: "black",
-                created_at: "2019-04-30T20:40:36Z",
-                description: "",
-                id: 2629580,
-                lat: 41.8197102811,
-                lon: -71.4030567126,
-                map_id: 0,
-                name: "",
-                order: 0,
-                updated_at: "2019-04-30T20:40:36Z",
-                way_id: 0,
-                way_order: 0
-            },
-            {
-                author: "warren",
-                body: null,
-                color: "black",
-                created_at: "2019-04-30T20:40:36Z",
-                description: "",
-                id: 2629581,
-                lat: 41.8198082274,
-                lon: -71.4035100059,
-                map_id: 0,
-                name: "",
-                order: 0,
-                updated_at: "2019-04-30T20:40:36Z",
-                way_id: 0,
-                way_order: 0
-            }
-        ],
-        parent_id: null,
-        thumbnail: null,
-        updated_at: "2019-04-30T20:40:36Z",
-        width: 214,
-        src: "https://s3.amazonaws.com/grassrootsmapping/warpables/312455/test.png",
-        srcmedium: "https://s3.amazonaws.com/grassrootsmapping/warpables/312455/test_medium.png"
-    },
-    {
-        cm_per_pixel: 0,
-        created_at: "2019-04-30T20:40:25Z",
-        deleted: false,
-        height: 166,
-        history: "",
-        id: 312456,
-        image_content_type: "image/png",
-        image_file_name: "test.png",
-        image_file_size: 103148,
-        locked: false,
-        map_id: 13238,
-        nodes: [],
-        parent_id: null,
-        thumbnail: null,
-        updated_at: "2019-04-30T20:40:25Z",
-        width: 214,
-        src: "https://s3.amazonaws.com/grassrootsmapping/warpables/312456/test.png",
-        srcmedium: "https://s3.amazonaws.com/grassrootsmapping/warpables/312456/test_medium.png"
-    }
-];
-
 require("axios").get("https://mapknitter.org/maps/pvdtest/warpables.json").then(function(data) {
+    console.log(data.data[0].nodes)
     console.log(convert(data.data))
 })
