@@ -1,4 +1,4 @@
-function convert(arr) {
+module.exports = function convert(arr) {
     let rv = []
     let minX, maxX, minY, maxY, width = 0, height = 0;
     for (let obj of arr) {
@@ -32,7 +32,6 @@ function convert(arr) {
             coords.push({ x: Math.round((node.lon - minX) * width / (maxX - minX)), y: Math.round((node.lat - minY) * height / (maxY - minY)) });
         }
         if (flag) {
-            console.log(coords)
             vals.steps = `webgl-distort{${encodeURIComponent(`nw:${coords[0].x}%2C${coords[0].y}|ne:${coords[1].x}%2C${coords[1].y}|se:${coords[2].x}%2C${coords[2].y}|sw:${coords[3].x}%2C${coords[3].y}`)}}`
             let lminX, lminY;
             for (let o of coords) {
@@ -56,7 +55,3 @@ function convert(arr) {
     obj.steps = str;
     return [obj];
 }
-
-require("axios").get("https://mapknitter.org/maps/ceres--2/warpables.json").then(function(data) {
-    console.log(`/?steps=${JSON.stringify(convert(data.data))}`);
-})

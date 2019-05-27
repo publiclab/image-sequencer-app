@@ -38,7 +38,13 @@ router.get("/process", (req, res) => {
         res.send(html);
     });
 
-})
+});
+
+router.get("/convert", (req, res) => {
+    require("axios").get(req.query.url).then(function(data) {
+        res.send(req.protocol + '://' + req.get('host') + req.baseUrl + "/process" + `/?steps=${JSON.stringify(require('../../util/converter')(data.data))}`);
+    });
+});
 
 
 router.use("/", (req, res) => {
