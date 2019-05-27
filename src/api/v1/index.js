@@ -30,56 +30,13 @@ router.get("/process", (req, res) => {
 
     let imgs = body.steps,
         upload = body.upload === 'true';
-    imgs.sort((a, b) => a.id - b.id); // sort the input on id
 
-    let includedSteps = {}, // stores the steps which are included in the graph
-        independentSteps = [];
-    //build the graph
-    var g = [];
-    for (let img of imgs) {
-        if (img.hasOwnProperty("depends")) {
-            includedSteps[img.id] = true;
-            for (let Did of img.depends) {
-                includedSteps[Did] = true;
-                g.push([Did, img.id]);
-            }
-        }
-    }
-    for (let img of imgs) {
-        if (!includedSteps[img.id])
-            independentSteps.push(img);
-    }
-
-    imgs = require('toposort')(g).map((id) => imgs[id - 1]); //topologically sort imgs
-    imgs.push(...independentSteps);
-    // console.log(imgs)
-
-    let i = 0, rv = {};
-
-    let cb = (out) => {
-        rv[imgs[i].id] = out;
-        if (i < imgs.length - 1) {
-            console.log(imgs[i].id);
-            i++;
-            if (typeof imgs[i].input === 'number') imgs[i].input = rv[imgs[i].input];
-            process(imgs[i].input, imgs[i].steps, cb);
-        } else {
-
-
-
-            /* Here we want combine the images */
-
-            var html = `<html>`
-            for (let img of Object.values(rv)) {
-                html += `<img src= "${img}">`
-            }
-            html += `</html>`
-            res.send(html);
-        }
-    }
-    if (typeof imgs[0].input === 'number') imgs[0].input = rv[img[0].input];
-
-    process(imgs[0].input, imgs[0].steps, cb);
+    process(imgs[0].input, imgs[0].steps, function(data) {
+        var html = `<html>`
+        html += `<img src= "${data}">`
+        html += `</html>`
+        res.send(html);
+    });
 
 })
 
@@ -90,7 +47,8 @@ router.use("/", (req, res) => {
 
 function process(img, sequence, cb) {
 
-    const sequencerInstance = sequencer({ ui: false });
+    const sequencerInstance = sequencer({ ui: true });
+    sequencerInstance.loadNewModule('overlay', require('image-sequencer-app-overlay'))
     sequencerInstance.loadImages(img, () => {
         sequencerInstance.importString(sequence);
         sequencerInstance.run(cb);
