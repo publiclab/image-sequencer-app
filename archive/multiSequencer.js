@@ -1,6 +1,8 @@
-const router = require('express').Router(),
+const app = require('express')(),
     sequencer = require('image-sequencer');
-
+const bp = require('body-parser');
+app.use(bp.json())
+app.use(bp.urlencoded({ extended: true }))
 
 // router.post("/process", (req, res) => {
 
@@ -17,7 +19,7 @@ const router = require('express').Router(),
 
 // });
 
-router.get("/process", (req, res) => {
+app.get("/process", (req, res) => {
 
     let body;
     if (Object.keys(req.body).length === 0) {
@@ -54,47 +56,64 @@ router.get("/process", (req, res) => {
     imgs.push(...independentSteps);
     // console.log(imgs)
 
-    let i = 0, rv = {};
+    var i = 0, rv = {};
 
     let cb = (out) => {
-        rv[imgs[i].id] = out;
-        if (i < imgs.length - 1) {
-            console.log(imgs[i].id);
-            i++;
-            if (typeof imgs[i].input === 'number') imgs[i].input = rv[imgs[i].input];
-            process(imgs[i].input, imgs[i].steps, cb);
-        } else {
-
-
-
-            /* Here we want combine the images */
-
-            var html = `<html>`
-            for (let img of Object.values(rv)) {
-                html += `<img src= "${img}">`
+        if (i < imgs.length) {
+            for (let j = i; j < imgs.length; j++) {
+                let flag = true;
+                for (let num of imgs[j].depends) {
+                    if (!Object.keys(rv).includes(num + '')) {
+                        flag = false;
+                        break;
+                    }
+                }
+                if (flag == false) {
+                    break;
+                } else {
+                    i++;
+                    process(imgs[j].input, imgs[j].steps, rv, imgs, j, cb);
+                }
             }
+        } else {
+            var html = `<html>`
+            html += `<img src= "${out}">`
             html += `</html>`
             res.send(html);
         }
     }
-    if (typeof imgs[0].input === 'number') imgs[0].input = rv[img[0].input];
+    for (let j = i; j < imgs.length; j++) {
+        if (imgs[j].depends.length == 0) {
+            i++;
+            process(imgs[j].input, imgs[j].steps, rv, imgs, i - 1, cb);
+        } else {
+            break;
+        }
+    }
+});
 
-    process(imgs[0].input, imgs[0].steps, cb);
 
-})
-
-
-router.use("/", (req, res) => {
+app.use("/", (req, res) => {
     res.sendStatus(404);
 });
 
-function process(img, sequence, cb) {
-
+function process(img, sequence, rv, imgs, num, cb) {
+    // console.log(imgs[num].id)
+    if (typeof img === 'number') img = rv[img];
+    for (let key of Object.keys(rv)) {
+        sequence = sequence.replace(`output>${key}`, encodeURIComponent(rv[key]));
+    }
     const sequencerInstance = sequencer({ ui: false });
     sequencerInstance.loadImages(img, () => {
+        sequencerInstance.loadNewModule('overlay', require('image-sequencer-app-overlay'));
         sequencerInstance.importString(sequence);
-        sequencerInstance.run(cb);
+        sequencerInstance.run((out) => {
+            rv[imgs[num].id] = out;
+            cb(out);
+        });
     });
 }
 
-module.exports = router;
+app.listen(8000, () => {
+    console.log("MultiSequencer server started at port 8000");
+})
