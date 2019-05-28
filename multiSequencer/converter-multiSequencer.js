@@ -1,4 +1,4 @@
-function convert(arr) {
+module.exports = function convert(arr) {
     let rv = []
     let id = 1;
     let minX, maxX, minY, maxY, width = 0, height = 0;
@@ -64,6 +64,6 @@ function convert(arr) {
     return rv;
 }
 
-require("axios").get("https://mapknitter.org/maps/ceres--2/warpables.json").then(function(data) {
-    console.log(`https://us-central1-public-lab.cloudfunctions.net/is-function-edge/?steps=${JSON.stringify(convert(data.data))}`);
-})
+// require("axios").get("https://mapknitter.org/maps/ceres--2/warpables.json").then(function(data) {
+//     console.log(`https://us-central1-public-lab.cloudfunctions.net/is-function-edge/?steps=${JSON.stringify(convert(data.data))}`);
+// })

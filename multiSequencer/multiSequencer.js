@@ -19,6 +19,12 @@ app.use(bp.urlencoded({ extended: true }))
 
 // });
 
+app.get('/convert', (req, res) => {
+    require("axios").get(req.query.url).then(function(data) {
+        res.send(req.protocol + '://' + req.get('host') + req.baseUrl + "/process" + `/?steps=${JSON.stringify(require('./converter-multiSequencer')(data.data))}`);
+    });
+});
+
 app.get("/process", (req, res) => {
 
     let body;
