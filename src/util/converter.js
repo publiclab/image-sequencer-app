@@ -47,10 +47,10 @@ module.exports = function convert(arr) {
         }
     }
     let obj = { id: 1, input: rv[0].input }
-    let str = rv[0].steps + `,canvas-resize{width:${width}|height:${height}|x:${lMins[0].x}|y:${lMins[0].y}}`;
+    let str = rv[0].steps + `,canvas-resize{width:${width + 1000}|height:${height + 1000}|x:${lMins[0].x}|y:${lMins[0].y}}`;
     for (let i in rv) {
         if (i == 0) continue;
-        str += `,import-image{url:${rv[i].input}},${rv[i].steps},overlay{x:${lMins[i].x}|y:${lMins[i].y}}`
+        str += `,import-image{url:${rv[i].input}},${rv[i].steps},overlay{x:${lMins[i].x}|y:${lMins[i].y}|offset:-3}`
     }
     obj.steps = str;
     return [obj];
