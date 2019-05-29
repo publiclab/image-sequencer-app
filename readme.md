@@ -20,8 +20,7 @@ Alternatively the json files can also sent as body of a post request on the same
 
 ## Routes
 ```js
-// POST : /api/v2/process
-{
+// GET : /api/v2/process/?
     steps: [
         {
             input: <URL> // Url for the image to be processed
@@ -35,7 +34,12 @@ Alternatively the json files can also sent as body of a post request on the same
         }
     ],
     upload: <Boolean> // Tells the server to upload the final image to the cloud
-}
+
+```
+```js
+// GET : /api/v2/convert/?
+    url : <URL> // Url for the josn file.
+
 ```
 
 ## Response
