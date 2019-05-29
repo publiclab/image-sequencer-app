@@ -1,10 +1,26 @@
+# Mapknitter-Exporter-js
+A simple app based on the Image sequencer project to run mapknitter exports in the cloud.
+
+npm: [https://npmjs.com/package/image-sequencer](https://npmjs.com/image-sequencer)
+
+github: [Image Sequencer](https://github.com/publiclab/image-sequencer)
+
 [![Build Status](https://travis-ci.org/publiclab/image-sequencer-app.svg?branch=main)](https://travis-ci.org/publiclab/image-sequencer-app)
 
-# This is the Image Sequencer API based on express.js
+## Usage
+v1: (Linear Processing)(slow)
 
-## Request Structure:
+`/api/v1/export/?url=wrapables.json`
+
+v2: (Concurrent Processing)(fast)
+
+`/api/v2/export/?url=wrapables.json`
+
+Alternatively the json files can also sent as body of a post request on the same path.
+
+## Routes
 ```js
-// POST : /api/v1/process
+// POST : /api/v2/process
 {
     steps: [
         {
@@ -18,15 +34,9 @@
 
         }
     ],
-    upload: <Boolean> // Tells the server to upload the final image
-    redirect: <Boolean> //Tells the server whether to return as json or to redirect
+    upload: <Boolean> // Tells the server to upload the final image to the cloud
 }
 ```
 
-## Response Structure
-```js
-{
-    data: <URI> // the dataURI of the final output
-}
-
-```
+## Response
+An html page with the Image embedded in it. The upload option is not working as of now.
