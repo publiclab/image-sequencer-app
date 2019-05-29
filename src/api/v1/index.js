@@ -2,21 +2,6 @@ const router = require('express').Router(),
     sequencer = require('image-sequencer');
 
 
-// router.post("/process", (req, res) => {
-
-//     /*  Import the image into sequencer, possibly from the url
-//         Next step is to import the sequence given as the string
-//         then we generate the ouput and return as data URI or
-//         upload it imgur and return the url of the image.
-//     */
-//     const imgs = req.body.images,
-//         upload = req.body.upload === 'true';
-//     process(img, sequence, (out) => {
-//         res.status(200).send({ data: out });
-//     });
-
-// });
-
 router.get("/process", (req, res) => {
 
     let body;
@@ -42,7 +27,13 @@ router.get("/process", (req, res) => {
 
 router.get("/convert", (req, res) => {
     require("axios").get(req.query.url).then(function(data) {
-        res.send(req.protocol + '://' + req.get('host') + req.baseUrl + "/process" + `/?steps=${JSON.stringify(require('../../util/converter')(data.data))}`);
+        res.send(req.protocol + '://' + req.get('host') + req.baseUrl + "/process" + `/?steps=${JSON.stringify(require('./util/converter')(data.data))}`);
+    });
+});
+router.use('/export', (req, res) => {
+    let url = req.query.url || req.body;
+    require("axios").get(url).then(function(data) {
+        res.redirect(req.protocol + '://' + req.get('host') + "/api/v1/process" + `/?steps=${JSON.stringify(require('./util/converter')(data.data))}`);
     });
 });
 
@@ -53,7 +44,7 @@ router.use("/", (req, res) => {
 
 function process(img, sequence, cb) {
 
-    const sequencerInstance = sequencer({ ui: true });
+    const sequencerInstance = sequencer({ ui: false });
     sequencerInstance.loadNewModule('overlay', require('image-sequencer-app-overlay'))
     sequencerInstance.loadImages(img, () => {
         sequencerInstance.importString(sequence);

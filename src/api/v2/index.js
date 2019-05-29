@@ -1,27 +1,16 @@
-const app = require('express')(),
+const app = require('express').Router(),
     sequencer = require('image-sequencer');
-const bp = require('body-parser');
-app.use(bp.json())
-app.use(bp.urlencoded({ extended: true }))
-
-// router.post("/process", (req, res) => {
-
-//     /*  Import the image into sequencer, possibly from the url
-//         Next step is to import the sequence given as the string
-//         then we generate the ouput and return as data URI or
-//         upload it imgur and return the url of the image.
-//     */
-//     const imgs = req.body.images,
-//         upload = req.body.upload === 'true';
-//     process(img, sequence, (out) => {
-//         res.status(200).send({ data: out });
-//     });
-
-// });
 
 app.get('/convert', (req, res) => {
     require("axios").get(req.query.url).then(function(data) {
-        res.send(req.protocol + '://' + req.get('host') + req.baseUrl + "/process" + `/?steps=${JSON.stringify(require('./converter-multiSequencer')(data.data))}`);
+        res.send(req.protocol + '://' + req.get('host') + req.baseUrl + "/process" + `/?steps=${JSON.stringify(require('./util/converter-multiSequencer')(data.data))}`);
+    });
+});
+
+app.use('/export', (req, res) => {
+    let url = req.query.url || req.body;
+    require("axios").get(url).then(function(data) {
+        res.redirect(req.protocol + '://' + req.get('host') + "/api/v2/process" + `/?steps=${JSON.stringify(require('./util/converter-multiSequencer')(data.data))}`);
     });
 });
 
@@ -120,6 +109,4 @@ function process(img, sequence, rv, imgs, num, cb) {
     });
 }
 
-app.listen(8000, () => {
-    console.log("MultiSequencer server started at port 8000");
-})
+module.exports = app;

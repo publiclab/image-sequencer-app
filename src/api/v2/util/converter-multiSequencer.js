@@ -3,8 +3,10 @@ module.exports = function convert(arr) {
     let id = 1;
     let minX, maxX, minY, maxY, width = 0, height = 0;
     for (let obj of arr) {
-        width += obj.width;
-        height += obj.height;
+        if (obj["nodes"].length != 0) {
+            width += obj.width;
+            height += obj.height;
+        }
         for (let node of obj["nodes"]) {
             if (!minX || minX > node.lon) {
                 minX = node.lon;
@@ -20,7 +22,7 @@ module.exports = function convert(arr) {
             }
         }
     }
-    while (width * height * 4 > Math.pow(2, 26)) {
+    while (width * height * 4 > Math.pow(2, 30)) {
         width /= 2;
         height /= 2;
     }
@@ -55,7 +57,7 @@ module.exports = function convert(arr) {
     }
     // console.log(lMins)
     let vals = { id: id, input: rv[0].id, depends: dependsArray };
-    vals.steps = `canvas-resize{width:${width + 1000}|height:${height + 1000}|x:${lMins[0].x}|y:${lMins[0].y}}`;
+    vals.steps = `canvas-resize{width:${width}|height:${height}|x:${lMins[0].x}|y:${lMins[0].y}}`;
     for (let i in rv) {
         if (i == 0) continue;
         vals.steps += `,import-image{url:output>${rv[i].id}},overlay{x:${lMins[i].x}|y:${lMins[i].y}}`;
