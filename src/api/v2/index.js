@@ -1,9 +1,9 @@
 const app = require('express').Router(),
     sequencer = require('image-sequencer');
 
-app.get('/convert', (req, res) => {
-    require("axios").get(req.query.url).then(function(data) {
-        res.send(req.protocol + '://' + req.get('host') + req.baseUrl + "/process" + `/?steps=${JSON.stringify(require('./util/converter-multiSequencer')(data.data))}`);
+app.use('/convert', (req, res) => {
+    require("axios").get(req.query.url || req.body).then(function(data) {
+        res.send(req.protocol + '://' + req.get('host') + "api/v2/process" + `/?steps=${JSON.stringify(require('./util/converter-multiSequencer')(data.data))}`);
     });
 });
 
@@ -16,40 +16,31 @@ app.use('/export', (req, res) => {
 
 app.get("/process", (req, res) => {
 
-    let body;
-    if (Object.keys(req.body).length === 0) {
-        body = req.query;
-        body.steps = JSON.parse(body.steps)
-    }
-    else
-        body = req.body;
+    let body = req.query;
+    body.steps = JSON.parse(body.steps);
 
 
     let imgs = body.steps,
         upload = body.upload === 'true';
     imgs.sort((a, b) => a.id - b.id); // sort the input on id
 
-    let includedSteps = {}, // stores the steps which are included in the graph
-        independentSteps = [];
+
     //build the graph
     var g = [];
     for (let img of imgs) {
         if (img.hasOwnProperty("depends")) {
-            includedSteps[img.id] = true;
             for (let Did of img.depends) {
-                includedSteps[Did] = true;
                 g.push([Did, img.id]);
             }
         }
     }
-    for (let img of imgs) {
-        if (!includedSteps[img.id])
-            independentSteps.push(img);
-    }
 
-    imgs = require('toposort')(g).map((id) => imgs[id - 1]); //topologically sort imgs
-    imgs.push(...independentSteps);
-    // console.log(imgs)
+
+    let sortedImgs = require('toposort')(g).map((id) => imgs[id - 1]); //topologically sort imgs
+    if (sortedImgs.length == 0) {
+        sortedImgs.push[imgs.length - 1]; // For the case with only 1 step
+    }
+    imgs = sortedImgs;
 
     var i = 0, rv = {};
 
@@ -93,7 +84,7 @@ app.use("/", (req, res) => {
 });
 
 function process(img, sequence, rv, imgs, num, cb) {
-    // console.log(imgs[num].id)
+
     if (typeof img === 'number') img = rv[img];
     for (let key of Object.keys(rv)) {
         sequence = sequence.replace(`output>${key}`, encodeURIComponent(rv[key]));
