@@ -4,7 +4,7 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args: ['push', 'gcr.io/public-lab/image-sequencer-app']
 - name: 'gcr.io/cloud-builders/kubectl'
-  args: ['set', 'image', 'deployment/image-sequencer-app', '*=gcr.io/public-lab/image-sequencer-app']
+  args: ['set', 'image', 'deployment/image-sequencer-app', '*=gcr.io/public-lab/image-sequencer-app:latest']
   env:
   - 'CLOUDSDK_COMPUTE_ZONE=us-east1'
   - 'CLOUDSDK_CONTAINER_CLUSTER=mapknitter'
