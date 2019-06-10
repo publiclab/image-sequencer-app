@@ -18,7 +18,7 @@ router.get("/process", (req, res) => {
 
     process(imgs[0].input, imgs[0].steps, function(data) {
         var html = `<html>`
-        html += `<img src= "${data}">`
+        html += `<img width="100%" src= "${data}">`
         html += `</html>`
         res.send(html);
     });
