@@ -63,7 +63,7 @@ app.get("/process", (req, res) => {
             }
         } else {
             var html = `<html>`
-            html += `<img src= "${out}">`
+            html += `<img width="100%" src= "${out}">`
             html += `</html>`
             res.send(html);
         }
