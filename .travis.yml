@@ -7,7 +7,7 @@ before_install:
   - docker build -t image-sequencer-app .
   - docker-compose build
 
-script: docker-compose run image-sequencer-app npm test
+script: docker-compose run image-sequencer-app bash -c "npm install && npm test"
 os:
   - linux
   # - osx : No docker support
