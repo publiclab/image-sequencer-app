@@ -78,6 +78,9 @@ app.get("/process", (req, res) => {
                 mapknitterBucket.upload(path.join(__dirname, `../../../temp/export${pid}.html`), {
                     gzip: true
                 }).then(() => {
+                    mapknitterBucket
+                        .file(`export${pid}.html`)
+                        .makePublic();
                     fs.unlinkSync(path.join(__dirname, `../../../temp/export${pid}.html`));
                 });
             } else {
@@ -99,11 +102,12 @@ app.get("/process", (req, res) => {
 
 app.get("/status", (req, res) => {
     mapknitterBucket.getFiles().then((files) => {
-        if (files[0].map(el => el.metadata.name).includes(`export${req.query.pid}.html`))
-            res.send("Please check bucket for export" + req.query.pid + ".html");
+        let index = files[0].map(el => el.metadata.name).indexOf(`export${req.query.pid}.html`);
+        if (index != -1)
+            res.redirect(files[0][index].metadata.mediaLink);
         else
             res.send("Still working on it");
-    })
+    });
 });
 
 
