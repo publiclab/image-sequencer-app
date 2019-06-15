@@ -18,7 +18,7 @@ app.use('/convert', (req, res) => {
 app.use('/export', (req, res) => {
     let url = req.query.url || req.body;
     require("axios").get(url).then(function(data) {
-        res.redirect(req.protocol + '://' + req.get('host') + "/api/v2/process" + `/?steps=${JSON.stringify(require('./util/converter-multiSequencer')(data.data))}`);
+        res.redirect(req.protocol + '://' + req.get('host') + "/api/v2/process" + `/?upload=${req.query.upload}&steps=${JSON.stringify(require('./util/converter-multiSequencer')(data.data))}`);
     });
 });
 
@@ -27,11 +27,9 @@ app.get("/process", (req, res) => {
     let body = req.query;
     body.steps = JSON.parse(body.steps);
 
-
     let imgs = body.steps,
         upload = body.upload === 'true';
     imgs.sort((a, b) => a.id - b.id); // sort the input on id
-
 
     //build the graph
     var g = [];
@@ -75,13 +73,16 @@ app.get("/process", (req, res) => {
             var html = `<html>`
             html += `<img width="100%" src= "${out}">`
             html += `</html>`
-
-            fs.writeFileSync(path.join(__dirname, `../../../temp/export${pid}.html`), html);
-            mapknitterBucket.upload(path.join(__dirname, `../../../temp/export${pid}.html`), {
-                gzip: true
-            }).then(() => {
-                fs.unlinkSync(path.join(__dirname, `../../../temp/export${pid}.html`));
-            });
+            if (upload) {
+                fs.writeFileSync(path.join(__dirname, `../../../temp/export${pid}.html`), html);
+                mapknitterBucket.upload(path.join(__dirname, `../../../temp/export${pid}.html`), {
+                    gzip: true
+                }).then(() => {
+                    fs.unlinkSync(path.join(__dirname, `../../../temp/export${pid}.html`));
+                });
+            } else {
+                res.send(html);
+            }
         }
     }
     for (let j = i; j < imgs.length; j++) {
@@ -89,7 +90,8 @@ app.get("/process", (req, res) => {
             i++;
             process(imgs[j].input, imgs[j].steps, rv, imgs, i - 1, cb);
         } else {
-            res.status(200).send(`Your Image is exporting, to load Image please visit, ${req.protocol + '://' + req.get('host') + "/api/v2/status/?pid=" + pid}`);
+            if (upload)
+                res.status(200).send(`Your Image is exporting, to load Image please visit, ${req.protocol + '://' + req.get('host') + "/api/v2/status/?pid=" + pid}`);
             break;
         }
     }
