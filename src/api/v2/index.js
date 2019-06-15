@@ -1,6 +1,14 @@
 const app = require('express').Router(),
-    sequencer = require('image-sequencer');
+    sequencer = require('image-sequencer'),
+    fs = require('fs'),
+    pid = require('process').pid;
+const { Storage } = require('@google-cloud/storage'), path = require('path');
+const gCloud = new Storage({
+    keyFilename: path.join(__dirname, '../../../secrets/Public Lab-c8b7dbd98fbf.json'),
+    projectId: 'public-lab'
+});
 
+const mapknitterBucket = gCloud.bucket('mapknitter-is');
 app.use('/convert', (req, res) => {
     require("axios").get(req.query.url || req.body).then(function(data) {
         res.send(req.protocol + '://' + req.get('host') + "api/v2/process" + `/?steps=${JSON.stringify(require('./util/converter-multiSequencer')(data.data))}`);
@@ -67,7 +75,13 @@ app.get("/process", (req, res) => {
             var html = `<html>`
             html += `<img width="100%" src= "${out}">`
             html += `</html>`
-            res.send(html);
+
+            fs.writeFileSync(path.join(__dirname, `../../../temp/export${pid}.html`), html);
+            mapknitterBucket.upload(path.join(__dirname, `../../../temp/export${pid}.html`), {
+                gzip: true
+            }).then(() => {
+                fs.unlinkSync(path.join(__dirname, `../../../temp/export${pid}.html`));
+            });
         }
     }
     for (let j = i; j < imgs.length; j++) {
@@ -75,9 +89,19 @@ app.get("/process", (req, res) => {
             i++;
             process(imgs[j].input, imgs[j].steps, rv, imgs, i - 1, cb);
         } else {
+            res.status(200).send(`Your Image is exporting, to load Image please visit, ${req.protocol + '://' + req.get('host') + "/api/v2/status/?pid=" + pid}`);
             break;
         }
     }
+});
+
+app.get("/status", (req, res) => {
+    mapknitterBucket.getFiles().then((files) => {
+        if (files[0].map(el => el.metadata.name).includes(`export${req.query.pid}.html`))
+            res.send("Please check bucket for export" + req.query.pid + ".html");
+        else
+            res.send("Still working on it");
+    })
 });
 
 
