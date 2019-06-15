@@ -42,9 +42,10 @@ app.get("/process", (req, res) => {
     }
     imgs = sortedImgs;
 
-    var i = 0, rv = {};
+    var i = 0, rv = {}, processCount = 0;
 
     let cb = (out) => {
+        processCount--;
         if (i < imgs.length) {
             for (let j = i; j < imgs.length; j++) {
                 let flag = true;
@@ -56,8 +57,9 @@ app.get("/process", (req, res) => {
                 }
                 if (flag == false) {
                     break;
-                } else {
+                } else if (processCount < 10) {
                     i++;
+                    processCount++;
                     process(imgs[j].input, imgs[j].steps, rv, imgs, j, cb);
                 }
             }
