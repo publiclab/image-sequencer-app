@@ -63,7 +63,7 @@ app.get("/process", (req, res) => {
                 }
                 if (flag == false) {
                     break;
-                } else if (processCount < 10) {
+                } else if (processCount < 5) {
                     i++;
                     processCount++;
                     process(imgs[j].input, imgs[j].steps, rv, imgs, j, cb);
