@@ -1,9 +1,10 @@
 const app = require('express').Router(),
     sequencer = require('image-sequencer'),
     fs = require('fs'),
-    pid = require('process').pid;
+    pid = require('process').pid + "" + Math.round(Math.random() * 1000);
 const { Storage } = require('@google-cloud/storage'), path = require('path');
 const gCloud = new Storage({
+    keyFilename: path.join(__dirname, '../../../secrets/Public Lab-c8b7dbd98fbf.json'),
     projectId: 'public-lab'
 });
 
