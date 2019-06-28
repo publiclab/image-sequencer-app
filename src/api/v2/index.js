@@ -4,7 +4,6 @@ const app = require('express').Router(),
     pid = require('process').pid;
 const { Storage } = require('@google-cloud/storage'), path = require('path');
 const gCloud = new Storage({
-    keyFilename: path.join(__dirname, '../../../secrets/Public Lab-c8b7dbd98fbf.json'),
     projectId: 'public-lab'
 });
 
