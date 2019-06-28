@@ -4,7 +4,7 @@
   "description": "",
   "main": "src/server.js",
   "scripts": {
-    "start": "node src/server.js",
+    "start": "node --max-old-space-size=8192 src/server.js ",
     "test": "mocha --timeout 100000"
   },
   "author": "Varun Gupta <varun.gupta1798@gmail.com>",
