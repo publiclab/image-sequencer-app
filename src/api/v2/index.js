@@ -3,10 +3,7 @@ const app = require('express').Router(),
     fs = require('fs'),
     pid = require('process').pid + "" + Math.round(Math.random() * 1000);
 const { Storage } = require('@google-cloud/storage'), path = require('path');
-const gCloud = new Storage({
-    keyFilename: path.join(__dirname, '../../../secrets/Public Lab-c8b7dbd98fbf.json'),
-    projectId: 'public-lab'
-});
+const gCloud = new Storage();
 
 const mapknitterBucket = gCloud.bucket('mapknitter-is');
 app.use('/convert', (req, res) => {
