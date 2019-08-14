@@ -1,8 +1,11 @@
-module.exports = function convert(arr,scale) {
+const hv = require('haversine')
+module.exports = function convert(arr, scale) {
     let rv = []
     let id = 1;
     let minX, maxX, minY, maxY;
     for (let obj of arr) {
+        obj.width = parseInt(obj.width)
+        obj.height = parseInt(obj.height)
         for (let node of obj["nodes"]) {
             node.lat = parseFloat(node.lat);
             node.lon = parseFloat(node.lon);
@@ -27,9 +30,30 @@ module.exports = function convert(arr,scale) {
         let vals = { id: id, input: obj.src, depends: [] }
         let flag = false, coords = []
         id++;
-        for (let node of obj["nodes"]) {
+        for (let it = 0; it < obj["nodes"].length; it++) {
+            let offset = 1
+            let node = obj["nodes"][(it + offset) % obj["nodes"].length]
             flag = true;
-            coords.push({ x: Math.round((node.lon - minX) * Math.cos(node.lat * Math.PI / 180) * 111 * 1000 * scale / (maxX - minX)), y: Math.round((node.lat - minY) * 1000 * 111 * scale / (maxY - minY)) });
+            let start = {
+                longitude: minX,
+                latitude: minY
+            }
+            let end = {
+                longitude: node.lon,
+                latitude: minY,
+            }
+            const minDistX = hv(start, end, { unit: 'meter' })
+            start = {
+                longitude: minX,
+                latitude: minY
+            }
+            end = {
+                longitude: minX,
+                latitude: node.lat
+            }
+            const minDistY = hv(start, end, { unit: 'meter' })
+
+            coords.push({ x: minDistX * scale, y: minDistY * scale });
         }
         console.log(coords)
         if (flag) {
@@ -51,7 +75,7 @@ module.exports = function convert(arr,scale) {
         }
     }
     let vals = { id: id, input: rv[0].id, depends: dependsArray };
-    vals.steps = `canvas-resize{width:${1000}|height:${1000}|x:${lMins[0].x}|y:${lMins[0].y}}`;
+    vals.steps = `canvas-resize{width:${1000}|height:${1000}|x:${0}|y:${0}}`;
     for (let i in rv) {
         if (i == 0) continue;
         vals.steps += `,import-image{url:output>${rv[i].id}},overlay{x:${lMins[i].x}|y:${lMins[i].y}}`;

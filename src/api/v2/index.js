@@ -16,9 +16,10 @@ app.use('/convert', (req, res) => {
 
 app.use('/export', (req, res) => {
     let url = req.query.url || req.body;
+    let scale = req.query.scale
     console.log("Export endpoint hit for url " + url);
     require("axios").get(url).then(function(data) {
-        res.redirect(req.protocol + '://' + req.get('host') + "/api/v2/process" + `/?upload=${req.query.upload}&steps=${JSON.stringify(require('./util/converter-multiSequencer')(data.data))}`);
+        res.redirect(req.protocol + '://' + req.get('host') + "/api/v2/process" + `/?upload=${req.query.upload}&scale=${scale}&steps=${JSON.stringify(require('./util/converter-multiSequencer')(data.data, parseFloat(scale)))}`);
         console.log("Export endpoint redirected to process for url " + url);
     });
 });
@@ -29,6 +30,7 @@ app.get("/process", (req, res) => {
     body.steps = JSON.parse(body.steps);
 
     console.log("Processing started with id " + pid + "\nThe following are the steps:\n" + JSON.stringify(body.steps));
+    console.log(`Using Scale: ${body.scale}`)
 
     let imgs = body.steps,
         upload = body.upload === 'true';
