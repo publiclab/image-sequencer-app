@@ -2,6 +2,8 @@ const hv = require('haversine')
 module.exports = function convert(arr, scale) {
     let rv = []
     let id = 1;
+
+    // find min/max coordinates
     let minX, maxX, minY, maxY;
     for (let obj of arr) {
         obj.width = parseInt(obj.width)
@@ -30,50 +32,50 @@ module.exports = function convert(arr, scale) {
         let vals = { id: id, input: obj.src, depends: [] }
         let flag = false, coords = []
         id++;
-        for (let it = 0; it < obj["nodes"].length; it++) {
-            let offset = 1
-            let node = obj["nodes"][(it + offset) % obj["nodes"].length]
-            flag = true;
-            let start = {
-                longitude: minX,
-                latitude: minY
-            }
-            let end = {
-                longitude: node.lon,
-                latitude: minY,
-            }
-            const minDistX = hv(start, end, { unit: 'meter' })
-            start = {
-                longitude: minX,
-                latitude: minY
-            }
-            end = {
-                longitude: minX,
-                latitude: node.lat
-            }
-            const minDistY = hv(start, end, { unit: 'meter' })
 
-            coords.push({ x: minDistX * scale, y: minDistY * scale });
-        }
-        console.log(coords)
-        if (flag) {
-            vals.steps = `webgl-distort{${encodeURIComponent(`nw:${coords[0].x}%2C${coords[0].y}|ne:${coords[1].x}%2C${coords[1].y}|se:${coords[2].x}%2C${coords[2].y}|sw:${coords[3].x}%2C${coords[3].y}`)}}`
-            dependsArray.push(vals.id);
-            let lminX, lminY;
-            for (let o of coords) {
-                if (lminX === undefined || lminX > o.x) {
-                    lminX = o.x;
-                }
-                if (lminY === undefined || lminY > o.y) {
-                    lminY = o.y;
-                }
+        if (obj.nodes.length > 0) {
+            // reorder from 0, 2, 1, 3 to 0, 1, 2, 3 (NW, NE, SE, SW)
+            let nodes = [
+                obj["nodes"][0],
+                obj["nodes"][2],
+                obj["nodes"][1],
+                obj["nodes"][3]
+            ];
+         
+            console.log('minX, minY - ', minX, minY)
+            // collect coordinates relative to minX, minY origin
+            for (let node of nodes) {
+                flag = true;
+console.log(nodes, node);
+console.log('node.lon, node.lat - ', node.lon, node.lat)
+                //const minDistY = hv(start, end, { unit: 'meter' })
+                coords.push({
+                    x: Math.round((node.lon - minX) * scale),
+                    y: Math.round((node.lat - minY) * scale)
+                });
+console.log(coords)
             }
-            lMins.push({ x: lminX, y: lminY });
-            rv.push(vals);
-        } else {
-            id--;
+            if (flag) {
+                vals.steps = `webgl-distort{${encodeURIComponent(`nw:${coords[0].x}%2C${coords[0].y}|ne:${coords[1].x}%2C${coords[1].y}|se:${coords[2].x}%2C${coords[2].y}|sw:${coords[3].x}%2C${coords[3].y}`)}}`
+ 
+                dependsArray.push(vals.id);
+                let lminX, lminY;
+                for (let o of coords) {
+                    if (lminX === undefined || lminX > o.x) {
+                        lminX = o.x;
+                    }
+                    if (lminY === undefined || lminY > o.y) {
+                        lminY = o.y;
+                    }
+                }
+                lMins.push({ x: lminX, y: lminY });
+                rv.push(vals);
+            } else {
+                id--;
+            }
         }
     }
+
     let vals = { id: id, input: rv[0].id, depends: dependsArray };
     vals.steps = `canvas-resize{width:${1000}|height:${1000}|x:${0}|y:${0}}`;
     for (let i in rv) {
