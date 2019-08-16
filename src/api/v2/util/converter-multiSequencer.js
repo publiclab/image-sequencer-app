@@ -1,5 +1,35 @@
 const hv = require('haversine')
 const proj = require('proj4')
+
+var earthRadius = 6378137;
+
+var SphericalMercator = {
+
+	R: earthRadius,
+	MAX_LATITUDE: 85.0511287798,
+
+	project: function (latlng) {
+		var d = Math.PI / 180,
+		    max = this.MAX_LATITUDE,
+		    lat = Math.max(Math.min(max, latlng.lat), -max),
+		    sin = Math.sin(lat * d);
+
+		return [
+			this.R * latlng.lng * d,
+			this.R * Math.log((1 + sin) / (1 - sin)) / 2
+                ];
+	},
+
+	unproject: function (point) {
+		var d = 180 / Math.PI;
+
+		return [
+			(2 * Math.atan(Math.exp(point.y / this.R)) - (Math.PI / 2)) * d,
+			point.x * d / this.R
+                ];
+	}
+}
+
 module.exports = function convert(arr, scale) {
     let rv = []
     let id = 1;
@@ -42,14 +72,16 @@ module.exports = function convert(arr, scale) {
                 obj["nodes"][1],
                 obj["nodes"][3]
             ];
-            let [minX, minY] = proj('EPSG:900913', [minLon, minLat]);
-         
+            //let [minX, minY] = proj('WGS84','EPSG:900913', [minLon, minLat]);
+            let [minX, minY] = SphericalMercator.project({lat: minLat, lng: minLon})
+
             console.log('minLon, minLat - ', minLon, minLat)
             // collect coordinates relative to minLon, minLat origin
             for (let node of nodes) {
                 flag = true;
 console.log('node.lon, node.lat - ', node.lon, node.lat)
-                let coord = proj('EPSG:900913', [node.lon, node.lat]);
+                //let coord = proj('WGS84','EPSG:900913', [node.lon, node.lat]);
+                let coord = SphericalMercator.project({lat: node.lat, lng: node.lon})
 console.log(coord, minX, minY)
                 coords.push({
                     x: Math.round((coord[0] - minX) * scale),
