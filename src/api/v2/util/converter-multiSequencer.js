@@ -1,21 +1,22 @@
 const hv = require('haversine')
+const proj = require('proj4')
 module.exports = function convert(arr, scale) {
     let rv = []
     let id = 1;
 
     // find min/max coordinates
-    let minX, maxX, minY, maxY;
+    let minLon, maxX, minLat, maxY;
     for (let obj of arr) {
         obj.width = parseInt(obj.width)
         obj.height = parseInt(obj.height)
         for (let node of obj["nodes"]) {
             node.lat = parseFloat(node.lat);
             node.lon = parseFloat(node.lon);
-            if (!minX || minX > node.lon) {
-                minX = node.lon;
+            if (!minLon || minLon > node.lon) {
+                minLon = node.lon;
             }
-            if (!minY || minY > node.lat) {
-                minY = node.lat;
+            if (!minLat || minLat > node.lat) {
+                minLat = node.lat;
             }
             if (!maxX || maxX < node.lon) {
                 maxX = node.lon;
@@ -41,17 +42,18 @@ module.exports = function convert(arr, scale) {
                 obj["nodes"][1],
                 obj["nodes"][3]
             ];
+            let [minX, minY] = proj('EPSG:900913', [minLon, minLat]);
          
-            console.log('minX, minY - ', minX, minY)
-            // collect coordinates relative to minX, minY origin
+            console.log('minLon, minLat - ', minLon, minLat)
+            // collect coordinates relative to minLon, minLat origin
             for (let node of nodes) {
                 flag = true;
-console.log(nodes, node);
 console.log('node.lon, node.lat - ', node.lon, node.lat)
-                //const minDistY = hv(start, end, { unit: 'meter' })
+                let coord = proj('EPSG:900913', [node.lon, node.lat]);
+console.log(coord, minX, minY)
                 coords.push({
-                    x: Math.round((node.lon - minX) * scale),
-                    y: Math.round((node.lat - minY) * scale)
+                    x: Math.round((coord[0] - minX) * scale),
+                    y: Math.round((coord[1] - minY) * scale)
                 });
 console.log(coords)
             }
@@ -59,16 +61,16 @@ console.log(coords)
                 vals.steps = `webgl-distort{${encodeURIComponent(`nw:${coords[0].x}%2C${coords[0].y}|ne:${coords[1].x}%2C${coords[1].y}|se:${coords[2].x}%2C${coords[2].y}|sw:${coords[3].x}%2C${coords[3].y}`)}}`
  
                 dependsArray.push(vals.id);
-                let lminX, lminY;
+                let lminLon, lminLat;
                 for (let o of coords) {
-                    if (lminX === undefined || lminX > o.x) {
-                        lminX = o.x;
+                    if (lminLon === undefined || lminLon > o.x) {
+                        lminLon = o.x;
                     }
-                    if (lminY === undefined || lminY > o.y) {
-                        lminY = o.y;
+                    if (lminLat === undefined || lminLat > o.y) {
+                        lminLat = o.y;
                     }
                 }
-                lMins.push({ x: lminX, y: lminY });
+                lMins.push({ x: lminLon, y: lminLat });
                 rv.push(vals);
             } else {
                 id--;
