@@ -35,12 +35,12 @@ module.exports = function convert(arr, scale) {
         id++;
 
         if (obj.nodes.length > 0) {
-            // reorder from 0, 2, 1, 3 to 0, 1, 2, 3 (NW, NE, SE, SW)
+            // reorder from 0, 2, 1, 3 to 3, 1, 2, 0
             let nodes = [
-                obj["nodes"][0],
+                obj["nodes"][3],
                 obj["nodes"][2],
                 obj["nodes"][1],
-                obj["nodes"][3]
+                obj["nodes"][0]
             ];
             let [minX, minY] = proj('WGS84','EPSG:900913', [minLon, minLat]);
 
@@ -50,7 +50,7 @@ module.exports = function convert(arr, scale) {
                 let coord = proj('WGS84','EPSG:900913', [node.lon, node.lat]);
                 coords.push({
                     x: Math.round((coord[0] - minX) * scale),
-                    y: Math.round((coord[1] - minY) * scale)
+                    y: Math.round((coord[1] - minY) * scale) * -1
                 });
             }
             if (flag) {
