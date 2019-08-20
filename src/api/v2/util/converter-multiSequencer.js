@@ -64,6 +64,7 @@ module.exports = function convert(arr, scale) {
                     lminLat = o.y;
                 }
             }
+
             lMins.push({ x: lminLon, y: lminLat });
             rv.push(vals);
         }
