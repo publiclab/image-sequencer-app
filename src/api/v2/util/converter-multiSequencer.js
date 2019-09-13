@@ -42,7 +42,7 @@ module.exports = function convert(arr, scale) {
                 obj["nodes"][1],
                 obj["nodes"][0]
             ];
-            let [minX, minY] = proj('WGS84', 'EPSG:900913', [minLon, minLat]);
+            let [minX, minY] = proj('WGS84', 'EPSG:900913', [minLon, maxY]);
 
             // collect coordinates relative to minLon, minLat origin
             for (let node of nodes) {
@@ -55,7 +55,7 @@ module.exports = function convert(arr, scale) {
             vals.steps = `webgl-distort{${encodeURIComponent(`nw:${coords[0].x}%2C${coords[0].y}|ne:${coords[1].x}%2C${coords[1].y}|se:${coords[2].x}%2C${coords[2].y}|sw:${coords[3].x}%2C${coords[3].y}`)}}`
 
             dependsArray.push(vals.id);
-            let lminLon, lminLat;
+            let lminLon, lminLat, lmaxLon, lmaxLat;
             for (let o of coords) {
                 if (lminLon === undefined || lminLon > o.x) {
                     lminLon = o.x;
@@ -63,9 +63,18 @@ module.exports = function convert(arr, scale) {
                 if (lminLat === undefined || lminLat > o.y) {
                     lminLat = o.y;
                 }
+                if (lmaxLon === undefined || lmaxLon < o.x) {
+                    lmaxLon = o.x;
+                }
+                if (lmaxLat === undefined || lmaxLat < o.y) {
+                    lmaxLat = o.y;
+                }
             }
 
+            vals.steps += `,resize{${encodeURIComponent(`w:${lmaxLon - lminLon}|h:${lmaxLat - lminLat}`)}}`
+
             lMins.push({ x: lminLon, y: lminLat });
+            console.log(coords)
             rv.push(vals);
         }
         else {
@@ -73,8 +82,10 @@ module.exports = function convert(arr, scale) {
         }
     }
 
+    console.log("Local Mins:\n" + JSON.stringify(lMins))
+
     let vals = { id: id, input: rv[0].id, depends: dependsArray };
-    vals.steps = `canvas-resize{width:${5000}|height:${5000}|x:${0}|y:${0}}`;
+    vals.steps = `canvas-resize{width:${1000}|height:${1000}|x:${0}|y:${0}}`;
     for (let i in rv) {
         if (i == 0) continue;
         vals.steps += `,import-image{url:output>${rv[i].id}},overlay{x:${lMins[i].x}|y:${lMins[i].y}}`;
