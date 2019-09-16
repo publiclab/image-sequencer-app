@@ -86,8 +86,7 @@ module.exports = function convert(arr, scale) {
         }
     }
 
-    console.log("Local Mins:\n" + JSON.stringify(lMins))
-    console.log("Final Dimensions:\n" + [finalMaxLat, finalMaxLon])
+    console.log(`Final Dimensions: ${finalMaxLon} X ${finalMaxLat}`)
 
     let vals = { id: id, input: rv[0].id, depends: dependsArray };
     vals.steps = `canvas-resize{width:${finalMaxLon}|height:${finalMaxLat}|x:${0}|y:${0}}`;
