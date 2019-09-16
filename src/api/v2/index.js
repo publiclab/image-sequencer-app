@@ -130,6 +130,7 @@ function process(img, sequence, rv, imgs, num, cb) {
     const sequencerInstance = sequencer({ ui: true });
     sequencerInstance.loadImages(img, () => {
         sequencerInstance.loadNewModule('overlay', require('image-sequencer-app-overlay'));
+        sequencerInstance.loadNewModule('trim', require('image-sequencer-trim'));
         sequencerInstance.loadNewModule('resize', require('image-sequencer-app-resize'));
         sequencerInstance.importString(sequence);
         sequencerInstance.run((out) => {

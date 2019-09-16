@@ -70,7 +70,7 @@ module.exports = function convert(arr, scale) {
                     lmaxLat = o.y;
                 }
             }
-
+            vals.steps += `,trim{}`
             vals.steps += `,resize{${encodeURIComponent(`w:${lmaxLon - lminLon}|h:${lmaxLat - lminLat}`)}}`
 
             lMins.push({ x: lminLon, y: lminLat });
