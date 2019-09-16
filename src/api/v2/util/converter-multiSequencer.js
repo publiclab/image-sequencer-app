@@ -37,11 +37,17 @@ module.exports = function convert(arr, scale) {
 
         if (obj.nodes.length > 0) {
             // reorder from 0, 2, 1, 3 to 3, 1, 2, 0
+            // let nodes = [
+            //     obj["nodes"][3],
+            //     obj["nodes"][2],
+            //     obj["nodes"][1],
+            //     obj["nodes"][0]
+            // ];
             let nodes = [
-                obj["nodes"][3],
-                obj["nodes"][2],
+                obj["nodes"][0],
                 obj["nodes"][1],
-                obj["nodes"][0]
+                obj["nodes"][2],
+                obj["nodes"][3],
             ];
             let [minX, minY] = proj('WGS84', 'EPSG:900913', [minLon, maxY]);
 
