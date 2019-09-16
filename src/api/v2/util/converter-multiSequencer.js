@@ -29,6 +29,7 @@ module.exports = function convert(arr, scale) {
 
     let dependsArray = [];
     let lMins = [];
+    let finalMaxLon = 0, finalMaxLat = 0;
     for (let obj of arr) {
         let vals = { id: id, input: obj.src, depends: [] }
         let flag = false, coords = []
@@ -70,6 +71,9 @@ module.exports = function convert(arr, scale) {
                     lmaxLat = o.y;
                 }
             }
+            if (lmaxLat > finalMaxLat) finalMaxLat = lmaxLat;
+            if (lmaxLon > finalMaxLon) finalMaxLon = lmaxLon;
+
             vals.steps += `,trim{}`
             vals.steps += `,resize{${encodeURIComponent(`w:${lmaxLon - lminLon}|h:${lmaxLat - lminLat}`)}}`
 
@@ -83,9 +87,10 @@ module.exports = function convert(arr, scale) {
     }
 
     console.log("Local Mins:\n" + JSON.stringify(lMins))
+    console.log("Final Dimensions:\n" + [finalMaxLat, finalMaxLon])
 
     let vals = { id: id, input: rv[0].id, depends: dependsArray };
-    vals.steps = `canvas-resize{width:${1000}|height:${1000}|x:${0}|y:${0}}`;
+    vals.steps = `canvas-resize{width:${finalMaxLon}|height:${finalMaxLat}|x:${0}|y:${0}}`;
     for (let i in rv) {
         if (i == 0) continue;
         vals.steps += `,import-image{url:output>${rv[i].id}},overlay{x:${lMins[i].x}|y:${lMins[i].y}}`;
