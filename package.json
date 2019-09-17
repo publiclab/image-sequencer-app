@@ -14,8 +14,12 @@
     "axios": "^0.18.0",
     "body-parser": "^1.18.3",
     "express": "^4.16.4",
+    "haversine": "^1.1.1",
     "image-sequencer": "^3.5.0",
     "image-sequencer-app-overlay": "^1.0.5",
+    "image-sequencer-app-resize": "^1.1.0",
+    "image-sequencer-trim": "^1.0.0",
+    "proj4": "^2.5.0",
     "toposort": "^2.0.2"
   },
   "devDependencies": {

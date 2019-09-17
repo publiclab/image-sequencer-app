@@ -7,15 +7,20 @@ const gCloud = new Storage();
 
 const mapknitterBucket = gCloud.bucket('mapknitter-is');
 app.use('/convert', (req, res) => {
+    console.log("Converter endpoint hit for url" + req.query.url);
     require("axios").get(req.query.url || req.body).then(function(data) {
         res.send(req.protocol + '://' + req.get('host') + "api/v2/process" + `/?steps=${JSON.stringify(require('./util/converter-multiSequencer')(data.data))}`);
+        console.log("Response sent from converter endpoint for url" + req.query.url);
     });
 });
 
 app.use('/export', (req, res) => {
     let url = req.query.url || req.body;
+    let scale = req.query.scale
+    console.log("Export endpoint hit for url " + url);
     require("axios").get(url).then(function(data) {
-        res.redirect(req.protocol + '://' + req.get('host') + "/api/v2/process" + `/?upload=${req.query.upload}&steps=${JSON.stringify(require('./util/converter-multiSequencer')(data.data))}`);
+        res.redirect(req.protocol + '://' + req.get('host') + "/api/v2/process" + `/?upload=${req.query.upload}&scale=${scale}&steps=${JSON.stringify(require('./util/converter-multiSequencer')(data.data, parseFloat(scale)))}`);
+        console.log("Export endpoint redirected to process for url " + url);
     });
 });
 
@@ -23,6 +28,9 @@ app.get("/process", (req, res) => {
 
     let body = req.query;
     body.steps = JSON.parse(body.steps);
+
+    console.log("Processing started with id " + pid + "\nThe following are the steps:\n" + JSON.stringify(body.steps));
+    console.log(`Using Scale: ${body.scale}`)
 
     let imgs = body.steps,
         upload = body.upload === 'true';
@@ -67,6 +75,7 @@ app.get("/process", (req, res) => {
                 }
             }
         } else {
+            console.log("Done processing for " + pid);
             var html = `<html>`
             html += `<img width="100%" src= "${out}">`
             html += `</html>`
@@ -118,9 +127,11 @@ function process(img, sequence, rv, imgs, num, cb) {
     for (let key of Object.keys(rv)) {
         sequence = sequence.replace(`output>${key}`, encodeURIComponent(rv[key]));
     }
-    const sequencerInstance = sequencer({ ui: false });
+    const sequencerInstance = sequencer({ ui: true });
     sequencerInstance.loadImages(img, () => {
         sequencerInstance.loadNewModule('overlay', require('image-sequencer-app-overlay'));
+        sequencerInstance.loadNewModule('trim', require('image-sequencer-trim'));
+        sequencerInstance.loadNewModule('resize', require('image-sequencer-app-resize'));
         sequencerInstance.importString(sequence);
         sequencerInstance.run((out) => {
             rv[imgs[num].id] = out;
