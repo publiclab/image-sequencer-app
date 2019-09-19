@@ -14,7 +14,8 @@ v1: (Linear Processing)(slow)
 
 v2: (Concurrent Processing)(fast)
 
-`/api/v2/export/?url=wrapables.json`
+`/api/v2/export/?url=wrapables.json&scale=integer`
+Test URL: http://34.74.118.242/api/v2/export/?url=http://mapknitter.org/maps/ceres--2/warpables.json&scale=3
 
 Alternatively the json files can also sent as body of a post request on the same path.
 
