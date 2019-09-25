@@ -3,6 +3,7 @@ const proj = require('proj4')
 module.exports = function convert(arr, scale) {
     let rv = []
     let id = 1;
+    scale = 100.0/scale; // convert from cm/px (the MapKnitter resolution standard) to px/meter, which we're using here
 
     // find min/max coordinates
     let minLon, maxX, minLat, maxY;
