@@ -19,7 +19,11 @@ v2: (Concurrent Processing)(fast)
 
 ### Scale
 
-Scale is expressed in `centimeters per pixel` -- 
+Scale is expressed in `centimeters per pixel`
+
+### URL
+
+The URL should return JSON in this format: http://mapknitter.org/maps/ceres--2/warpables.json
 
 ### Demo
 
