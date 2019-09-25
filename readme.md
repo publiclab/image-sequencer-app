@@ -8,16 +8,38 @@ github: [Image Sequencer](https://github.com/publiclab/image-sequencer)
 [![Build Status](https://travis-ci.org/publiclab/image-sequencer-app.svg?branch=main)](https://travis-ci.org/publiclab/image-sequencer-app)
 
 ## Usage
-v1: (Linear Processing)(slow)
+
+v1: (Linear Processing)(slow, deprecated)
 
 `/api/v1/export/?url=wrapables.json`
 
 v2: (Concurrent Processing)(fast)
 
 `/api/v2/export/?url=wrapables.json&scale=integer`
-Test URL: http://34.74.118.242/api/v2/export/?url=http://mapknitter.org/maps/ceres--2/warpables.json&scale=3
+
+### Scale
+
+Scale is expressed in `centimeters per pixel` -- 
+
+### Demo
+
+Try it out here!
+
+http://34.74.118.242/api/v2/export/?url=http://mapknitter.org/maps/ceres--2/warpables.json&scale=30
 
 Alternatively the json files can also sent as body of a post request on the same path.
+
+Compare the above example request to an equivalent one completed via the Ruby/GDAL/ImageMagick-based `mapknitter-exporter`: 
+
+http://export.mapknitter.org/export?url=https://mapknitter.org/maps/ceres--2/warpables.json&scale=30
+
+(see https://github.com/publiclab/mapknitter-exporter/)
+
+And compare the outputs:
+
+Ruby: 3816x2231 - https://mapknitter-exports-warps.storage.googleapis.com/1569446002/1569446002.jpg
+
+IS: 3440x2544 - https://publiclab.org/system/images/photos/000/035/438/original/download.jpeg
 
 ## Routes
 ```js
