@@ -1,7 +1,7 @@
 const app = require('express').Router(),
     sequencer = require('image-sequencer'),
     fs = require('fs'),
-    pid = require('process').pid + "" + Math.round(Math.random() * 1000);
+    pid = require('md5')(Date.now()) + "-" + Math.round(Math.random() * 100000);
 const { Storage } = require('@google-cloud/storage'), path = require('path');
 const gCloud = new Storage();
 
@@ -25,6 +25,25 @@ app.use('/export', (req, res) => {
 });
 
 app.get("/process", (req, res) => {
+
+    function process(img, sequence, rv, imgs, num, cb) {
+
+        if (typeof img === 'number') img = rv[img];
+        for (let key of Object.keys(rv)) {
+            sequence = sequence.replace(`output>${key}`, encodeURIComponent(rv[key]));
+        }
+        const sequencerInstance = sequencer({ ui: true });
+        sequencerInstance.loadImages(img, () => {
+            sequencerInstance.loadNewModule('overlay', require('image-sequencer-app-overlay'));
+            sequencerInstance.loadNewModule('trim', require('image-sequencer-trim'));
+            sequencerInstance.loadNewModule('resize', require('image-sequencer-app-resize'));
+            sequencerInstance.importString(sequence);
+            sequencerInstance.run((out) => {
+                rv[imgs[num].id] = out;
+                cb(out);
+            });
+        });
+    }
 
     let body = req.query;
     body.steps = JSON.parse(body.steps);
@@ -94,6 +113,8 @@ app.get("/process", (req, res) => {
             }
         }
     }
+
+
     for (let j = i; j < imgs.length; j++) {
         if (imgs[j].depends.length == 0) {
             i++;
@@ -120,24 +141,5 @@ app.get("/status", (req, res) => {
 app.use("/", (req, res) => {
     res.sendStatus(404);
 });
-
-function process(img, sequence, rv, imgs, num, cb) {
-
-    if (typeof img === 'number') img = rv[img];
-    for (let key of Object.keys(rv)) {
-        sequence = sequence.replace(`output>${key}`, encodeURIComponent(rv[key]));
-    }
-    const sequencerInstance = sequencer({ ui: true });
-    sequencerInstance.loadImages(img, () => {
-        sequencerInstance.loadNewModule('overlay', require('image-sequencer-app-overlay'));
-        sequencerInstance.loadNewModule('trim', require('image-sequencer-trim'));
-        sequencerInstance.loadNewModule('resize', require('image-sequencer-app-resize'));
-        sequencerInstance.importString(sequence);
-        sequencerInstance.run((out) => {
-            rv[imgs[num].id] = out;
-            cb(out);
-        });
-    });
-}
 
 module.exports = app;
