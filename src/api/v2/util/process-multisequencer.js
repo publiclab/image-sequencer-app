@@ -1,3 +1,5 @@
+const maxConcurrency = 10;
+
 const sequencer = require('image-sequencer'),
     fs = require('fs');
 const { Storage } = require('@google-cloud/storage'), path = require('path');
@@ -33,7 +35,7 @@ var i = 0, rv = {}, process_functionCount = 0;
 
 let cb = (out) => {
     process_functionCount--;
-    if (i < imgs.length) {
+    if (i < imgs.length && process_functionCount < maxConcurrency) {
         for (let j = i; j < imgs.length; j++) {
             let flag = true;
             for (let num of imgs[j].depends) {
@@ -44,7 +46,7 @@ let cb = (out) => {
             }
             if (flag == false) {
                 break;
-            } else if (process_functionCount < 5) {
+            } else if (process_functionCount < maxConcurrency) {
                 i++;
                 process_functionCount++;
                 process_function(imgs[j].input, imgs[j].steps, rv, imgs, j, cb);
@@ -69,7 +71,7 @@ let cb = (out) => {
 }
 
 for (let j = i; j < imgs.length; j++) {
-    if (imgs[j].depends.length == 0 && process_functionCount < 5) {
+    if (imgs[j].depends.length == 0 && process_functionCount < maxConcurrency) {
         i++;
         process_functionCount++;
         process_function(imgs[j].input, imgs[j].steps, rv, imgs, i - 1, cb);
