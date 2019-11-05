@@ -1,11 +1,10 @@
 const app = require('express').Router(),
-    sequencer = require('image-sequencer'),
-    fs = require('fs'),
     pid = require('md5')(Date.now()) + "-" + Math.round(Math.random() * 100000);
+
 const { Storage } = require('@google-cloud/storage'), path = require('path');
 const gCloud = new Storage();
-
 const mapknitterBucket = gCloud.bucket('mapknitter-is');
+
 app.use('/convert', (req, res) => {
     console.log("Converter endpoint hit for url" + req.query.url);
     require("axios").get(req.query.url || req.body).then(function(data) {
@@ -25,25 +24,6 @@ app.use('/export', (req, res) => {
 });
 
 app.get("/process", (req, res) => {
-
-    function process(img, sequence, rv, imgs, num, cb) {
-
-        if (typeof img === 'number') img = rv[img];
-        for (let key of Object.keys(rv)) {
-            sequence = sequence.replace(`output>${key}`, encodeURIComponent(rv[key]));
-        }
-        const sequencerInstance = sequencer({ ui: true });
-        sequencerInstance.loadImages(img, () => {
-            sequencerInstance.loadNewModule('overlay', require('image-sequencer-app-overlay'));
-            sequencerInstance.loadNewModule('trim', require('image-sequencer-trim'));
-            sequencerInstance.loadNewModule('resize', require('image-sequencer-app-resize'));
-            sequencerInstance.importString(sequence);
-            sequencerInstance.run((out) => {
-                rv[imgs[num].id] = out;
-                cb(out);
-            });
-        });
-    }
 
     let body = req.query;
     body.steps = JSON.parse(body.steps);
@@ -71,60 +51,10 @@ app.get("/process", (req, res) => {
         sortedImgs.push[imgs.length - 1]; // For the case with only 1 step
     }
     imgs = sortedImgs;
+    require('child_process').fork(require('path').join(__dirname, './util/process-multisequencer.js'), ['--imgs=' + JSON.stringify(imgs), '--pid=' + pid]);
 
-    var i = 0, rv = {}, processCount = 0;
+    res.status(200).send(`Your Image is exporting, to load Image please visit, ${req.protocol + '://' + req.get('host') + "/api/v2/status/?pid=" + pid}`);
 
-    let cb = (out) => {
-        processCount--;
-        if (i < imgs.length) {
-            for (let j = i; j < imgs.length; j++) {
-                let flag = true;
-                for (let num of imgs[j].depends) {
-                    if (!Object.keys(rv).includes(num + '')) {
-                        flag = false;
-                        break;
-                    }
-                }
-                if (flag == false) {
-                    break;
-                } else if (processCount < 5) {
-                    i++;
-                    processCount++;
-                    process(imgs[j].input, imgs[j].steps, rv, imgs, j, cb);
-                }
-            }
-        } else {
-            console.log("Done processing for " + pid);
-            var html = `<html>`
-            html += `<img width="100%" src= "${out}">`
-            html += `</html>`
-            if (upload) {
-                fs.writeFileSync(path.join(__dirname, `../../../temp/export${pid}.html`), html);
-                mapknitterBucket.upload(path.join(__dirname, `../../../temp/export${pid}.html`), {
-                    gzip: true
-                }).then(() => {
-                    mapknitterBucket
-                        .file(`export${pid}.html`)
-                        .makePublic();
-                    fs.unlinkSync(path.join(__dirname, `../../../temp/export${pid}.html`));
-                });
-            } else {
-                res.send(html);
-            }
-        }
-    }
-
-
-    for (let j = i; j < imgs.length; j++) {
-        if (imgs[j].depends.length == 0) {
-            i++;
-            process(imgs[j].input, imgs[j].steps, rv, imgs, i - 1, cb);
-        } else {
-            if (upload)
-                res.status(200).send(`Your Image is exporting, to load Image please visit, ${req.protocol + '://' + req.get('host') + "/api/v2/status/?pid=" + pid}`);
-            break;
-        }
-    }
 });
 
 app.get("/status", (req, res) => {
