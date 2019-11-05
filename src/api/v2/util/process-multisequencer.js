@@ -10,6 +10,8 @@ var imgs = JSON.parse(argv.imgs),
 
 function process_function(img, sequence, rv, imgs, num, cb) {
 
+    console.log("Current Concurrency: " + process_functionCount);
+
     if (typeof img === 'number') img = rv[img];
     for (let key of Object.keys(rv)) {
         sequence = sequence.replace(`output>${key}`, encodeURIComponent(rv[key]));
@@ -67,8 +69,9 @@ let cb = (out) => {
 }
 
 for (let j = i; j < imgs.length; j++) {
-    if (imgs[j].depends.length == 0) {
+    if (imgs[j].depends.length == 0 && process_functionCount < 5) {
         i++;
+        process_functionCount++;
         process_function(imgs[j].input, imgs[j].steps, rv, imgs, i - 1, cb);
     } else {
         break;
