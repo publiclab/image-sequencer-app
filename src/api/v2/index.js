@@ -14,13 +14,20 @@ app.use('/convert', (req, res) => {
 });
 
 app.use('/export', (req, res) => {
-    let url = req.query.url || req.body;
     let scale = req.query.scale
-    console.log("Export endpoint hit for url " + url);
-    require("axios").get(url).then(function(data) {
+    // supplying a URL for a remote images JSON file:
+    if (req.query.url) {
+      let url = req.query.url || req.body;
+      console.log("Export endpoint hit for url " + url);
+      require("axios").get(url).then(redirectToProcess);
+    } else { // supplying JSON for images directly:
+      redirectToProcess(req.query.collection);
+    }
+    function redirectToProcess(data) {
         res.redirect(req.protocol + '://' + req.get('host') + "/api/v2/process" + `/?upload=${req.query.upload}&scale=${scale}&steps=${JSON.stringify(require('./util/converter-multiSequencer')(data.data, parseFloat(scale)))}`);
         console.log("Export endpoint redirected to process for url " + url);
-    });
+    }
+
 });
 
 app.get("/process", (req, res) => {
