@@ -65,7 +65,7 @@ describe('/GET /ap1/v2/export', () => {
 /*
  * Test the /api/v2/export route with included non-remote JSON
  */
-describe('/GET /ap1/v2/export', () => {
+describe('/POST /ap1/v2/export with enclosed JSON image collection', () => {
     it('should send response', (done) => {
         // example JSON images collection as in spec at https://github.com/publiclab/mapknitter-exporter-sinatra#usage
         var json = [{"nodes":[
