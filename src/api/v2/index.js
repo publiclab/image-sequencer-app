@@ -14,7 +14,7 @@ app.use('/convert', (req, res) => {
 });
 
 app.use('/export', (req, res) => {
-    console.log("REQUEST",req)
+    console.log("REQUEST",req.query)
     let scale = req.query.scale
     // supplying a URL for a remote images JSON file:
     if (req.query.url) {
