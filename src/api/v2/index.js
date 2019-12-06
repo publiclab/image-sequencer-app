@@ -24,9 +24,9 @@ app.use('/export', (req, res) => {
       redirectToProcess({data: req.query.collection});
     }
     function redirectToProcess(data) {
-        res.redirect(req.protocol + '://' + req.get('host') + "/api/v2/process" + `/?upload=${req.query.upload}&scale=${scale}&steps=${JSON.stringify(require('./util/converter-multiSequencer')(data.data, parseFloat(scale)))}`);
-        if (req.query.url) console.log("Export endpoint redirected to process for url " + url);
-        else console.log("Processing enclosed JSON: " + req.query.collection)
+      if (req.query.url) console.log("Export endpoint redirected to process for url " + url);
+      else console.log("Processing enclosed JSON: " + req.query.collection)
+      res.redirect(req.protocol + '://' + req.get('host') + "/api/v2/process" + `/?upload=${req.query.upload}&scale=${scale}&steps=${JSON.stringify(require('./util/converter-multiSequencer')(data.data, parseFloat(scale)))}`);
     }
 
 });
