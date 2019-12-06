@@ -36,14 +36,27 @@ var json = [{"nodes":[
             "src":"https://s3.amazonaws.com/grassrootsmapping/warpables/320983/test.png"}
         ];
 
-// now we submit the request to the v2 export endpoint:
-$.post("http://34.74.118.242/api/v2/export/", {
-  scale: 30,
-  upload: true,
-  collection: json
-}).done(function(response) {
-  console.log('response');
-});
+var opts = {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ 
+    upload: true,
+    collection: json,
+    scale: 30
+  })
+};
+
+let response = await fetch('http://34.74.118.242/api/v2/export/', opts);
+
+console.log(await response.text());
+```
+
+You should get a response like: 
+
+```
+Your Image is exporting, to load Image please visit, http://34.74.118.242/api/v2/status/?pid=3d8233faa2ade0f0cee400fba1170890-7153
 ```
 
 ### Scale
