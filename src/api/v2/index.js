@@ -14,20 +14,22 @@ app.use('/convert', (req, res) => {
 });
 
 app.use('/export', (req, res) => {
-    console.log("REQUEST",req.query)
-    let scale = req.query.scale
     // supplying a URL for a remote images JSON file:
     if (req.query.url) {
       var url = req.query.url || req.body;
+      var scale = req.query.scale
+      var upload = req.query.upload
       console.log("Export endpoint hit for url " + url);
       require("axios").get(url).then(redirectToProcess);
     } else { // supplying JSON for images directly:
-      redirectToProcess({data: req.query.collection});
+      var scale = req.body.scale
+      var upload = req.body.upload
+      redirectToProcess({data: req.body.collection});
     }
     function redirectToProcess(data) {
       if (req.query.url) console.log("Export endpoint redirected to process for url " + url);
-      else console.log("Processing enclosed JSON: " + req.query.collection)
-      res.redirect(req.protocol + '://' + req.get('host') + "/api/v2/process" + `/?upload=${req.query.upload}&scale=${scale}&steps=${JSON.stringify(require('./util/converter-multiSequencer')(data.data, parseFloat(scale)))}`);
+      else console.log("Processing enclosed JSON: " + req.body.collection)
+      res.redirect(req.protocol + '://' + req.get('host') + "/api/v2/process" + `/?upload=${upload}&scale=${scale}&steps=${JSON.stringify(require('./util/converter-multiSequencer')(data.data, parseFloat(scale)))}`);
     }
 
 });
