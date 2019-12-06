@@ -17,6 +17,37 @@ v2: (Concurrent Processing)(fast)
 
 `/api/v2/export/?url=wrapables.json&scale=integer`
 
+A POST request can be sent enclosing a JSON collection of image URLs and coordinates, as follows:
+
+```js
+var json = [{"nodes":[
+                {"lat":"41.8200378187","lon":"-71.4034409085"},
+                {"lat":"41.8199873593","lon":"-71.4030021564"},
+                {"lat":"41.8196229772","lon":"-71.4029728831"},
+                {"lat":"41.8198214546","lon":"-71.4034614433"}
+            ],
+            "cm_per_pixel":23.0934,
+            "src":"https://s3.amazonaws.com/grassrootsmapping/warpables/312455/test.png"},
+            {"nodes":[
+                {"lat":"41.819898342","lon":"-71.4035387139"},
+                {"lat":"41.819898342","lon":"-71.4028493862"},
+                {"lat":"41.8195005594","lon":"-71.4028493862"},
+                {"lat":"41.8195005594","lon":"-71.4035387139"}
+            ],
+            "cm_per_pixel":35.8578,
+            "src":"https://s3.amazonaws.com/grassrootsmapping/warpables/320983/test.png"}
+        ];
+
+// now we submit the request to the v2 export endpoint:
+$.post("http://34.74.118.242/api/v2/export/", {
+  scale: 30,
+  upload: true,
+  collection: json
+}).done(function(response) {
+  console.log('response');
+});
+```
+
 ### Scale
 
 Scale is expressed in `centimeters per pixel`
