@@ -9,13 +9,11 @@ github: [Image Sequencer](https://github.com/publiclab/image-sequencer)
 
 ## Usage
 
-v1: (Linear Processing)(slow, deprecated)
+v2: (Concurrent processing, fast)
 
-`/api/v1/export/?url=wrapables.json`
+Basic endpoint: `/api/v2/export/?url=http://example.com/warpables.json&scale=<integer>`
 
-v2: (Concurrent Processing)(fast)
-
-`/api/v2/export/?url=wrapables.json&scale=integer`
+Setting `upload=true` will also upload the output to Google Cloud storage, and return a URL to a persistent JSON status file, also at Google Cloud storage, which will be updated progressively to reflect export progress.
 
 A POST request can be sent enclosing a JSON collection of image URLs and coordinates, as follows:
 
