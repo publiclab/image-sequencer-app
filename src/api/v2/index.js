@@ -21,7 +21,7 @@ app.use('/export', (req, res) => {
       console.log("Export endpoint hit for url " + url);
       require("axios").get(url).then(redirectToProcess);
     } else { // supplying JSON for images directly:
-      redirectToProcess(req.query.collection);
+      redirectToProcess({data: req.query.collection});
     }
     function redirectToProcess(data) {
         res.redirect(req.protocol + '://' + req.get('host') + "/api/v2/process" + `/?upload=${req.query.upload}&scale=${scale}&steps=${JSON.stringify(require('./util/converter-multiSequencer')(data.data, parseFloat(scale)))}`);
