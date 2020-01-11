@@ -101,6 +101,8 @@ function changeStatus(newStatus, exportLink) {
     fs.writeFile(jsonPath, JSON.stringify(statusJson), () => {
         mapknitterBucket.upload(jsonPath, uploadOptions);
         if (exportLink)
-            fs.unlink(jsonPath);
+            fs.unlink(jsonPath, () => {
+                console.log("Successfully removed local files!");
+            });
     });
 }
