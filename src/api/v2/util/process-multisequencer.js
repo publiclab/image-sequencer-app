@@ -67,18 +67,19 @@ let cb = (out) => {
         var buf = new Buffer(data, 'base64');
         var filename = `export${pid}.jpg`
         var imgPath = path.join(__dirname, `../../../../temp/${filename}`);
-        fs.writeFileSync(imgPath, buf);
-        mapknitterBucket.upload(imgPath, {
-            gzip: true
-        }).then(() => {
-            mapknitterBucket
-                .file(filename)
-                .makePublic();
-            fs.unlinkSync(path.join(__dirname, imgPath));
-            mapknitterBucket.file(filename)
-                .getMetadata()
-                .then((data) => changeStatus("uploaded", data[0].mediaLink));
-       });
+        fs.writeFile(imgPath, buf, onWrote() {
+            mapknitterBucket.upload(imgPath, {
+                gzip: true
+            }).then(() => {
+                mapknitterBucket
+                    .file(filename)
+                    .makePublic();
+                fs.unlinkSync(path.join(__dirname, imgPath));
+                mapknitterBucket.file(filename)
+                    .getMetadata()
+                    .then((data) => changeStatus("uploaded", data[0].mediaLink));
+           });
+        });
     }
 }
 
