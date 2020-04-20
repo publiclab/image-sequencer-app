@@ -63,20 +63,22 @@ let cb = (out) => {
     } else {
         changeStatus("uploading");
         console.log("Done processing for " + pid);
-        var html = `<html>`
-        html += `<img width="100%" src= "${out}">`
-        html += `</html>`
-        fs.writeFileSync(path.join(__dirname, `../../../../temp/export${pid}.html`), html);
-        mapknitterBucket.upload(path.join(__dirname, `../../../../temp/export${pid}.html`), {
-            gzip: true
-        }).then(() => {
-            mapknitterBucket
-                .file(`export${pid}.html`)
-                .makePublic();
-            fs.unlinkSync(path.join(__dirname, `../../../../temp/export${pid}.html`));
-            mapknitterBucket.file(`export${pid}.html`)
-                .getMetadata()
-                .then((data) => changeStatus("uploaded", data[0].mediaLink));
+        var data = out.replace(/^data:image\/\w+;base64,/, ""); // strip off the data: url prefix to get just the base64-encoded bytes
+        var buf = new Buffer(data, 'base64');
+        var filename = `export${pid}.jpg`
+        var imgPath = path.join(__dirname, `../../../../temp/${filename}`);
+        fs.writeFile(imgPath, buf, onWrote() {
+            mapknitterBucket.upload(imgPath, {
+                gzip: true
+            }).then(() => {
+                mapknitterBucket
+                    .file(filename)
+                    .makePublic();
+                fs.unlinkSync(path.join(__dirname, imgPath));
+                mapknitterBucket.file(filename)
+                    .getMetadata()
+                    .then((data) => changeStatus("uploaded", data[0].mediaLink));
+           });
         });
     }
 }
