@@ -1,0 +1,25 @@
+name: A workflow for Github Actions Tutorial
+on: push
+
+jobs:
+  build:
+    name: main workflow
+    runs-on: ubuntu-latest
+    steps:
+
+      - name:  community-developed Action
+        uses: actions/checkout@v1
+
+      - name: Build docker image
+        run: docker build -t image-sequencer-app .
+      
+      - name: Build compose stack
+        run: docker-compose build
+      
+      - name: Run docker-compose script
+        run: docker-compose run image-sequencer-app bash -c "NODE_ENV=development npm install && npm test"
+
+
+
+        
+          
