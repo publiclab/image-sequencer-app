@@ -6,7 +6,3 @@ author: "muokicaleb@tuta.io"
 runs:
   using: "docker"
   image: "../Dockerfile"
-
-branding:
-  icon: "settings"
-  color: "purple"

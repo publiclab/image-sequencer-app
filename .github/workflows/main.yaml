@@ -11,7 +11,7 @@ jobs:
         uses: actions/checkout@v1
 
       - name: Setup docker
-        uses: ./actions
+        uses: docker build -t  image-sequencer-app .
       
       - name: Build compose stack
         run: docker-compose build
