@@ -10,8 +10,10 @@ jobs:
       - name:  community-developed Action
         uses: actions/checkout@v1
 
-      - name: Setup docker
-        uses: ./actions
+      - name: Build docker image
+        uses: actions/docker/cli@master
+        with:
+          args: build -t image-sequencer-app .
       
       - name: Build compose stack
         run: docker-compose build
