@@ -1,8 +1,0 @@
-name: "image sequencer app actions"
-description: "GitHub Actions  Image sequencer project "
-author: "muokicaleb@tuta.io"
-
-
-runs:
-  using: "docker"
-  image: "../Dockerfile"
