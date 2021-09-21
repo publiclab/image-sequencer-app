@@ -1,0 +1,15 @@
+name: tests
+runs-on: [pull-request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Docker Build
+        run: |
+          docker build -t image-sequencer-app .
+          docker-compose build
+      - name: Tests
+        run: docker-compose run image-sequencer-app bash -c "NODE_ENV=development npm install && npm test"
