@@ -1,5 +1,5 @@
 name: tests
-runs-on: [pull-request]
+on: [pull_request]
 
 jobs:
   build:
